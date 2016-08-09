@@ -1,6 +1,22 @@
 <?php
-    //phpinfo();
-?>
+	session_start();
+	if(!isset($_SESSION['username'])){
+	header("Location: logout_password.php");
+	}
+	if (isset($_POST['password1']) && $_POST['password2'] == $_POST['password1']){
+		require './db_connection.php';
+		require './db_connection.php';
+		$sql = "UPDATE auto_admin
+		SET password = :password
+		WHERE username = :username";
+	
+		$stmt = $dbConn -> prepare($sql);
+	$stmt -> execute(array(":username" => $_SESSION['username'], ":password" => hash("sha1", $_POST['password2'])));
+		echo "password";
+	} else {
+		echo "Passords do not match!!";
+	}
+?>	
 <html lang="en">
   <head>
     <meta charset="utf-8">
