@@ -172,12 +172,40 @@ require './db_connection.php';
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-    <!-- Optional theme -->
+        <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="signin.css">
+        
+        <script>
+function confirmDelete(stadiumName) {
+var remove = confirm("Do you really want to delete " + stadiumName + "?");
+if (!remove) {
+event.preventDefault();
+}
+}
+
+function confirmLogout(event) {
+var logout = confirm("Do you really want to log out?");
+if (!logout) {
+event.preventDefault();
+}
+}
+</script>
+ 	
   </head>
 
   <body>
+  	<div class="welcome">
+<form class="logout" method="post" action="logout.php" onsubmit="confirmLogout()">
+<input  type="submit" value="Logout" />
+</form>
+<form class="pass" method="post" action="password.php" >
+<input  type="submit" value="Password" />
+</form>
+<?php echo "<p  >Welcome " . $_SESSION['name'] . "<p>";?>
+	</div>
     <div class="container">
+
 
       <div class="page-header">
         <h1>Assignment 4 &amp; 5</h1>
