@@ -3,10 +3,10 @@
 session_start();
 
 if (isset($_POST['username'])){
-require '../db_connection.php';
+require './db_connection.php';
 
 $sql = "SELECT *
-FROM nfl_admin
+FROM auto_admin
 WHERE username = :username
 AND password = :password";
 
@@ -26,43 +26,35 @@ header("Location: index.php");
 
 ?>
 
-<!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
-Remove this if you use the .htaccess -->
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Assignment &amp; 5</title>
 
-<title>Lab 5 - Bude Su</title>
-<meta name="description" content="">
-<meta name="author" content="su5196">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-<meta name="viewport" content="width=device-width; initial-scale=1.0">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="signin.css">
+  </head>
 
-<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
-<link rel="shortcut icon" href="/favicon.ico">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <body>
+    <div class="container">
 
-<style>
-form {
-display: inline;
-}
-
-</style>
-
-</head>
-
-<body>
-<div>
-<h1>Login</h1>
-<form method="post">
-Username: <input type="text" name="username" /><br />
-<p></p>
-Password: <input type="password" name="password" /><br />
-<p></p>
-<input type="submit" value="Login" />
+<form  class="form-signin" method="post">
+	<h2 class="form-signin-heading">Please sign in</h2>
+<label for="inputUsername" class="sr-only">Username:</label>
+ <input type="text" class="form-control" name="username"  /><br />
+<label for="inputPassword" class="sr-only">Password:</label>
+ <input type="password" class="form-control" name="password" /><br />
+<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 <p></p>
 </form>
 <p>

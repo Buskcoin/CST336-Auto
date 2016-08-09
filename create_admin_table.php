@@ -1,7 +1,7 @@
 <?php
-    require "../db_connection.php";
+    require "./db_connection.php";
 	
-	$sql = "CREATE TABLE nfl_admin (
+	$sql = "CREATE TABLE auto_admin (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	firstname varchar (50),
 	lastname varchar (50),
@@ -11,7 +11,7 @@
 	$stmt = $dbConn -> prepare($sql);
 	$stmt -> execute();
 	
-	$sql = "INSERT INTO nfl_admin (firstname, lastname, username, password)
+	$sql = "INSERT INTO auto_admin (firstname, lastname, username, password)
 			VALUES
 			(:firstname, :lastname, :username, :password)";
 	$stmt = $dbConn -> prepare($sql);
