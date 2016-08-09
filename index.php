@@ -12,6 +12,8 @@ header("Location: login.php");
 <?php
 require './db_connection.php';
 
+	$error = "";
+	$result = "";
     if(isset($_GET['year'])) {
         $year = $_GET['year'];
     } else {
@@ -33,6 +35,53 @@ require './db_connection.php';
     if(isset($_GET['plate'])) {
        $current_car = getCarInformation($_GET['plate']);
     }
+	
+	if (isset ($_GET['addVehicle'])) {
+		
+		if($_GET['plate1'] == ""){
+			$error = "Please enter plate number!";
+		}
+		elseif($_GET['model1'] == "%"){
+			$error = "Please select a model!";
+		}
+		elseif($_GET['year1'] == "%"){
+			$error =  "Please select a year!";
+		}
+		elseif($_GET['color1'] == "%"){
+			$error =  "Please select a color!";
+		}
+		elseif($_GET['trim1'] == "%"){
+			$error =  "Please select trim!";
+		}
+		elseif($_GET['miles1'] == ""){
+			$error = "Please enter mileage!";
+		}
+		else{
+			$sql = "INSERT INTO car_dealership
+            	(plate, year, make, model, trim, color, miles)
+            	VALUES
+             	(:plate, :year, :make, :model, :trim, :color, :miles)";
+    		$stmt = $dbConn -> prepare($sql);
+    		$stmt -> execute ( array (":plate" => $_GET['plate1'],
+                              ":year" => $_GET['year1'],
+                              ":make" => 'Honda',
+                              ":model" => $_GET['model1'],
+                              ":trim" => $_GET['trim1'],
+                              ":color" => $_GET['color1'],
+                              ":miles" => $_GET['miles1']));    
+    		$result =  "Record was added!";  
+		}
+    	
+	}
+	
+	if (isset($_GET['delete'])) { 
+
+    $sql = "DELETE FROM car_dealership
+              WHERE plate = :plate";
+    $stmt = $dbConn -> prepare($sql);
+    $stmt -> execute( array(":plate"=> $_GET['delete']));
+    echo "Vehicle deleted!";      
+	}
 
     function getInventory($year, $model, $color) {
         global $dbConn;
@@ -61,6 +110,16 @@ require './db_connection.php';
         $sql = "SELECT DISTINCT model 
                 FROM car_dealership
                 ORDER BY model ASC";
+        $stmt = $dbConn -> prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+	
+	 function getTrims() {
+        global $dbConn;
+        $sql = "SELECT DISTINCT trim
+                FROM vehicle_trim
+                ORDER BY trim ASC";
         $stmt = $dbConn -> prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -96,7 +155,7 @@ require './db_connection.php';
         $stmt->execute();
         return $stmt->fetch();
     }
-	
+
 ?>
 
 <html lang="en">
@@ -113,7 +172,7 @@ require './db_connection.php';
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-    <!-- Optional theme -->
+        <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="signin.css">
         
@@ -147,6 +206,7 @@ event.preventDefault();
 	</div>
     <div class="container">
 
+
       <div class="page-header">
         <h1>Assignment 4 &amp; 5</h1>
         <p class="lead">Car dealership inventory lookup.</p>
@@ -173,7 +233,76 @@ event.preventDefault();
               </div>
           </div>
       <?php endif; ?>
+      
+      <div>
+          <h3>Add Inventory</h3>
+           <form method="get">
+              <div class="row">
+              	
+              	<div class="col-sm-2">
+                      <input class="form-control" type = "text" name = "plate1" placeholder="Plate Number" maxlength = '8'>
+                      
+                  </select>
+                  </div>
+                 <div class="col-sm-2">
+                     <select class="form-control" name="model1">
+                         <option value="%">Model</option>
+                         <?php foreach(getModels() as $value): ?>
+                             <option value="<? echo $value['model'] ?>"><? echo $value['model'] ?></option>
+                         <?php endforeach; ?>
+                     </select>
+                 </div>
+                 
+                 <div class="col-sm-2">
+                     <select class="form-control" id="year" name="year1">
+                     	<option value="%">Year</option>
+                         <?php
+                          for($i = date("Y")+2; $i > 1962; $i--){
+	                      echo '<option value="'.$i.'">'.$i.'</option>';
+                          }
+                         ?>
+                     </select>
+                 </div>
 
+                 <div class="col-sm-2">
+                     <select class="form-control" name="color1">
+                         <option value="%">Color</option>
+                         <?php foreach(getColors() as $value): ?>
+                             <option value="<? echo $value['color'] ?>"><? echo $value['color'] ?></option>
+                         <?php endforeach; ?>
+                     </select>
+                  </div>
+                  
+                  <div class="col-sm-2">
+                     <select class="form-control" name="trim1">
+                         <option value="%">Trim</option>
+                         <?php foreach(getTrims() as $value): ?>
+                             <option value="<? echo $value['trim'] ?>"><? echo $value['trim'] ?></option>
+                         <?php endforeach; ?>
+                     </select>
+                  </div>
+                  
+                  <div class="col-sm-2">
+                      <input class="form-control" type = "text" name = "miles1" placeholder="Mileage" maxlength = "7">
+                      
+                  </select>
+                  </div>
+               
+				  <div class="col-sm-2">
+                      <button class="btn btn-success btn" type="submit" name ="addVehicle">Add Inventory</button>
+                  </div>
+               
+              	        
+              </div>
+          </form>
+          <?php
+    		if ($result<>""){	
+    			echo $result;
+    		}	
+    		else{
+    			echo $error;
+    		}	
+    		?>
       <div>
           <h3>Filter Inventory</h3>
           <form method="get">
@@ -208,7 +337,7 @@ event.preventDefault();
                   <div class="col-sm-2">
                       <button class="btn btn-success btn" type="submit">Filter Inventory</button>
                   </div>
-
+               
               </div>
           </form>
       </div>
@@ -240,6 +369,12 @@ event.preventDefault();
                         <form method="get">
                             <input class="hidden" name="plate" value=<? echo $car['plate'] ?>>
                             <button class="btn btn-primary btn-xs pull-left" type="submit">View</button></td>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="get">
+                            <input class="hidden" name="delete" value=<? echo $car['plate'] ?>>
+                            <button class="btn btn-primary btn-xs pull-left" type="submit">Delete</button></td>
                         </form>
                     </td>
                 </tr>
