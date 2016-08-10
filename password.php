@@ -1,22 +1,24 @@
 <?php
-	session_start();
+
+session_start();
+
 	if(!isset($_SESSION['username'])){
-	header("Location: logout_password.php");
+	header("Location: password.php");
 	}
-	if (isset($_POST['password1']) && $_POST['password2'] == $_POST['password1']){
+    
+ if (isset($_POST['old_password']))
+	{
 		require './db_connection.php';
-		require './db_connection.php';
-		$sql = "UPDATE auto_admin
-		SET password = :password
-		WHERE username = :username";
-	
+
+		//$sql = "INSERT INTO auto_admin WHERE username = \$_SESSION['username'] AND password = :old_password VALUES('',)"
+		
+		$sql = "UPDATE auto_admin SET password=:new_password WHERE username=:username AND password=:old_password;";
+		
 		$stmt = $dbConn -> prepare($sql);
-	$stmt -> execute(array(":username" => $_SESSION['username'], ":password" => hash("sha1", $_POST['password2'])));
-		echo "password";
-	} else {
-		echo "Passords do not match!!";
+		$stmt -> execute(array(":username" => $_SESSION['username'], ":old_password" => hash("sha1", $_POST['old_password']), ":new_password" => hash("sha1", $_POST['new_password'])));
+
 	}
-?>	
+?>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -49,11 +51,14 @@ event.preventDefault();
 <h2>Change Password</h2>
 <p class="text-center">Use the form below to change your password. </p>
 <form class="form-signin" method="post" id="passwordForm" onsubmit="confirmPassword()">
-<input type="password" class="input-lg form-control" name="password1" id="password1" placeholder="New Password" autocomplete="off">
+	<input type="password" class="input-lg form-control" name="old_password" id="old_password" placeholder="Old Password" autocomplete="off">
 <br>
-<input type="password" class="input-lg form-control" name="password2" id="password2" placeholder="Repeat Password" autocomplete="off">
+<input type="password" class="input-lg form-control" name="new_password" id="new_password" placeholder="New Password" autocomplete="off">
 <br>
 <input type="submit" class="col-xs-12 btn btn-primary btn-load btn-lg" data-loading-text="Changing Password..." value="Change Password">
+<br>
+<input class="btn btn-lg btn-primary btn-block" type=button onClick="parent.location='index.php'" value='Go back'>
+
 </form>
 </div>
 </html>

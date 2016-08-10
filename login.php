@@ -2,6 +2,7 @@
 
 session_start();
 
+
 if (isset($_POST['username'])){
 require './db_connection.php';
 
@@ -23,6 +24,8 @@ $_SESSION['name'] = $record['firstname'] . " " . $record['lastname'];
 header("Location: index.php");
 }
 }
+
+
 
 ?>
 
@@ -57,9 +60,15 @@ header("Location: index.php");
 <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 <p></p>
 </form>
+
+<form class="form-signin" id='register' action='register.php' method='post' accept-charset='UTF-8'>
+	<fieldset >
+	<legend>Register</legend>
+	<button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+ 
+</fieldset>
+</form>
 <p>
-Username: grov1336<br />
-Password: 1234
 </p>
 </div>
 </body>

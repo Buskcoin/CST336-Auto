@@ -14,6 +14,18 @@ require './db_connection.php';
 
 	$error = "";
 	$result = "";
+	if(!isset($_SESSION['start_time'])) {
+	  $_SESSION['start_time'] = time();
+	  $_SESSION['start_time'] = date("H:i:s"); 
+	  $today = date("Y/m/d");
+	
+	  $sql = "INSERT INTO auto_login(username, date, time)
+	            VALUES
+	            (:username, :date, :time)";
+	    $stmt = $dbConn -> prepare($sql);
+	    $stmt -> execute (array (":username" => $_SESSION['username'], ":date" => $today, ":time" => $_SESSION['start_time']));
+	}
+
     if(isset($_GET['year'])) {
         $year = $_GET['year'];
     } else {
@@ -31,6 +43,12 @@ require './db_connection.php';
     } else {
         $color = "%";
     }
+
+    if(isset($_GET['plate'])) {
+       $current_car = getCarInformation($_GET['plate']);
+    }
+
+
 
     if(isset($_GET['plate'])) {
        $current_car = getCarInformation($_GET['plate']);
@@ -83,6 +101,7 @@ require './db_connection.php';
     echo "Vehicle deleted!";      
 	}
 
+
     function getInventory($year, $model, $color) {
         global $dbConn;
         $sql = "SELECT *
@@ -114,7 +133,6 @@ require './db_connection.php';
         $stmt->execute();
         return $stmt->fetchAll();
     }
-	
 	 function getTrims() {
         global $dbConn;
         $sql = "SELECT DISTINCT trim
@@ -124,6 +142,7 @@ require './db_connection.php';
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
 
     function getColors() {
         global $dbConn;
@@ -146,6 +165,14 @@ require './db_connection.php';
         $stmt->execute(array(':plate' => $plate));
         return $stmt->fetch();
     }
+	
+	function getLastLogTime($username) {
+		global $dbConn;
+        $sql = "SELECT time FROM auto_login WHERE username LIKE :username ORDER BY time DESC LIMIT 1,1";
+        $stmt = $dbConn -> prepare($sql);
+        $stmt->execute(array(':username' => $username));
+        return current($stmt->fetch());
+	}
 
     function getCarCount() {
         global $dbConn;
@@ -155,7 +182,7 @@ require './db_connection.php';
         $stmt->execute();
         return $stmt->fetch();
     }
-
+	
 ?>
 
 <html lang="en">
@@ -172,7 +199,7 @@ require './db_connection.php';
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-        <!-- Optional theme -->
+    <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="signin.css">
         
@@ -197,15 +224,15 @@ event.preventDefault();
   <body>
   	<div class="welcome">
 <form class="logout" method="post" action="logout.php" onsubmit="confirmLogout()">
-<input  type="submit" value="Logout" />
+<input class="btn btn-lg btn-primary btn-block" type="submit" value="Logout" />
 </form>
 <form class="pass" method="post" action="password.php" >
-<input  type="submit" value="Password" />
+<input class="btn btn-lg btn-primary btn-block" type="submit" value="Password" />
 </form>
 <?php echo "<p  >Welcome " . $_SESSION['name'] . "<p>";?>
+<?php echo "<p  >Last login time:" . getLastLogTime($_SESSION['username']) . "<p>";?>
 	</div>
     <div class="container">
-
 
       <div class="page-header">
         <h1>Assignment 4 &amp; 5</h1>
@@ -233,7 +260,7 @@ event.preventDefault();
               </div>
           </div>
       <?php endif; ?>
-      
+
       <div>
           <h3>Add Inventory</h3>
            <form method="get">
@@ -337,7 +364,7 @@ event.preventDefault();
                   <div class="col-sm-2">
                       <button class="btn btn-success btn" type="submit">Filter Inventory</button>
                   </div>
-               
+
               </div>
           </form>
       </div>
@@ -371,8 +398,8 @@ event.preventDefault();
                             <button class="btn btn-primary btn-xs pull-left" type="submit">View</button></td>
                         </form>
                     </td>
-                    <td>
-                        <form method="get">
+<td>
+<form method="get">
                             <input class="hidden" name="delete" value=<? echo $car['plate'] ?>>
                             <button class="btn btn-primary btn-xs pull-left" type="submit">Delete</button></td>
                         </form>
@@ -381,7 +408,7 @@ event.preventDefault();
             <?php endforeach; ?>
         </tbody>
       </table>
-      <small>Fetched <? print_r(getCarCount()); ?> vehicles.</small>
+      <small>Fetched <? print_r(current(getCarCount())); ?> vehicles.</small>
 
     </div> <!-- /container -->
 
